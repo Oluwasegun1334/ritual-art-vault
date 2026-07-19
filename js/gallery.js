@@ -182,6 +182,9 @@ const Modal = {
 
   open(artwork) {
     this.current = artwork;
+    // Push a fake history entry so the back button closes the modal
+    // instead of leaving the site entirely
+    history.pushState({ modalOpen: true }, '', location.href);
     const modal = document.getElementById('artwork-modal');
     const avg   = State.getAvgRating(artwork.id);
     const ranked = State.getRankedArtworks();
@@ -277,10 +280,21 @@ const Modal = {
     document.body.style.overflow = 'hidden';
   },
 
-  close() {
+  close(fromPopState = false) {
     const modal = document.getElementById('artwork-modal');
     modal.classList.remove('open');
     document.body.style.overflow = '';
     this.current = null;
+    // If closed by X button (not back button), pop the history state we pushed
+    if (!fromPopState && history.state?.modalOpen) {
+      history.back();
+    }
   },
 };
+
+// Back button (Android / browser) closes the modal instead of leaving the site
+window.addEventListener('popstate', (e) => {
+  if (Modal.current) {
+    Modal.close(true);
+  }
+});
