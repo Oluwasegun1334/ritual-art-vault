@@ -1,0 +1,23 @@
+# Dependencies — never commit these
+node_modules/
+
+# Build / dev scripts — not needed in production
+convert_to_webp.js
+optimize_assets.js
+package.json
+package-lock.json
+
+# Planning docs
+implementation_plan.md
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+
+# Original PNG logo (we serve logo.webp now)
+logo.png

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oluwasegun's Ritual Art Vault — Explore, Rate & Discover Art</title>
+  <meta name="description" content="Oluwasegun's Ritual Art Vault is a premium personal art gallery where you can browse, rate, and celebrate the finest artwork. Discover your favorites and see the Hall of Fame rankings.">
+  <meta name="theme-color" content="#0B0D12">
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Preconnect and Preload for faster loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="logo.webp" as="image" type="image/webp">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/main.css?v=11">
+  <link rel="stylesheet" href="css/hero.css?v=13">
+  <link rel="stylesheet" href="css/gallery.css?v=2">
+  <link rel="stylesheet" href="css/modal.css?v=8">
+  <link rel="stylesheet" href="css/rating.css?v=15">
+  <link rel="stylesheet" href="css/halloffame.css?v=14">
+  <link rel="stylesheet" href="css/login.css?v=5">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════ -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-logo" role="button" tabindex="0" aria-label="Oluwasegun's Ritual Art Vault home">
+    <img src="logo.webp" alt="Oluwasegun's Ritual Art Vault Logo">
+  </div>
+  <div class="nav-links" id="nav-links">
+    <div class="nav-link active" data-page="home" role="button" tabindex="0" aria-label="Gallery">
+      <span>Gallery</span>
+    </div>
+    <div class="nav-link" data-page="rate" role="button" tabindex="0" aria-label="Rate Art">
+      <span>Rate Art</span>
+    </div>
+    <div class="nav-link" data-page="halloffame" role="button" tabindex="0" aria-label="Hall of Fame">
+      <span>Hall of Fame</span>
+    </div>
+    <div class="nav-link" id="nav-logout" role="button" tabindex="0" aria-label="Logout" style="margin-left:auto;">
+      <span>Logout</span>
+    </div>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     APP CONTAINER
+══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ─── LOGIN PAGE ────────────────────── -->
+  <div id="login-page" class="page" role="main" aria-label="Login or Sign Up">
+
+    <!-- ── Layer 1: Full-screen hero landing (identical to home hero, buttons swapped) ── -->
+    <section id="auth-landing-panel" class="hero" aria-label="Landing page">
+      <!-- Floating particles -->
+      <div class="hero-particles" aria-hidden="true">
+        <div class="particle" style="left:8%; width:60px; height:80px; background:linear-gradient(135deg,#49ffca,#ffffff); --dur:14s; --delay:0s; border-radius:8px;"></div>
+        <div class="particle" style="left:18%; width:45px; height:55px; background:linear-gradient(135deg,#121212,#49ffca); --dur:11s; --delay:2s; border-radius:6px;"></div>
+        <div class="particle" style="left:72%; width:70px; height:50px; background:linear-gradient(135deg,#ffffff,#49ffca); --dur:16s; --delay:1s; border-radius:10px;"></div>
+        <div class="particle" style="left:85%; width:40px; height:60px; background:linear-gradient(135deg,#49ffca,#1a1a1a); --dur:13s; --delay:3s; border-radius:7px;"></div>
+        <div class="particle" style="left:55%; width:30px; height:40px; background:linear-gradient(135deg,#ffffff,#121212); --dur:10s; --delay:0.5s; border-radius:5px;"></div>
+        <div class="particle" style="left:35%; width:50px; height:65px; background:linear-gradient(135deg,#49ffca,#ffffff); --dur:15s; --delay:4s; border-radius:9px;"></div>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-title-line hero-title-art">Oluwasegun's</span>
+        <span class="hero-title-line hero-title-vault">Ritual Art Vault</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Explore, rate, and discover my artwork. Every piece has a story — find your favorites.
+      </p>
+
+      <div class="hero-cta">
+        <button id="landing-go-login" class="btn btn-primary" aria-label="Enter the vault">
+          Enter Vault
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ── Layer 2: Forms card (shown when Enter Vault is clicked) ── -->
+    <div id="auth-forms-wrap" style="display:none;">
+      <div class="login-container">
+        <div class="login-card">
+
+          <div class="login-header">
+            <div class="login-logo">Oluwasegun's Ritual Art Vault</div>
+            <div class="login-subtitle" id="login-subtitle">Enter your name to access the vault</div>
+          </div>
+
+          <!-- Error banner -->
+          <div class="auth-error" id="auth-error-banner">
+            <span class="auth-error-icon">⚠️</span>
+            <span id="auth-error-text">Please enter a valid username.</span>
+          </div>
+
+          <!-- Login Form Panel -->
+          <div class="auth-panel" id="auth-login-panel">
+            <form id="login-form" autocomplete="on">
+              <div class="form-group">
+                <label class="form-label" for="login-username">Name or Nickname</label>
+                <div class="input-field-wrap">
+                  <input type="text" id="login-username" class="input-field" required placeholder="Type your name..." autocomplete="username">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary auth-btn">Enter Vault</button>
+            </form>
+            <div class="auth-back">
+              <span class="auth-back-link" id="login-go-back">← Back</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#login-page -->
+
+
+  <!-- ─── HOME PAGE ─────────────────────── -->
+  <div id="home-page" class="page" role="main">
+
+    <!-- Hero -->
+    <section class="hero home-hero" aria-label="Art Vault hero section">
+      <!-- Floating particles -->
+      <div class="hero-particles" aria-hidden="true">
+        <div class="particle" style="left:8%; width:60px; height:80px; background:linear-gradient(135deg,#49ffca,#ffffff); --dur:14s; --delay:0s; border-radius:8px;"></div>
+        <div class="particle" style="left:18%; width:45px; height:55px; background:linear-gradient(135deg,#121212,#49ffca); --dur:11s; --delay:2s; border-radius:6px;"></div>
+        <div class="particle" style="left:72%; width:70px; height:50px; background:linear-gradient(135deg,#ffffff,#49ffca); --dur:16s; --delay:1s; border-radius:10px;"></div>
+        <div class="particle" style="left:85%; width:40px; height:60px; background:linear-gradient(135deg,#49ffca,#1a1a1a); --dur:13s; --delay:3s; border-radius:7px;"></div>
+        <div class="particle" style="left:55%; width:30px; height:40px; background:linear-gradient(135deg,#ffffff,#121212); --dur:10s; --delay:0.5s; border-radius:5px;"></div>
+        <div class="particle" style="left:35%; width:50px; height:65px; background:linear-gradient(135deg,#49ffca,#ffffff); --dur:15s; --delay:4s; border-radius:9px;"></div>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-title-line hero-title-vault">Welcome</span>
+      </h1>
+
+      <div class="hero-cta">
+        <button id="cta-rate" class="btn btn-primary" aria-label="Start rating artwork">
+          ★ Rate Art
+        </button>
+        <button id="cta-hof" class="btn btn-ghost" aria-label="View Hall of Fame">
+          🏆 Hall of Fame
+        </button>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section" aria-label="Art gallery">
+      <div class="gallery-section-header">
+        <div>
+          <div class="t-label" style="margin-bottom:0.5rem">The Collection</div>
+          <h2 class="gallery-section-title">Browse the Gallery</h2>
+        </div>
+        <div class="gallery-count-badge" id="gallery-count" aria-live="polite">Loading…</div>
+      </div>
+
+      <div class="masonry-gallery" id="masonry-gallery" role="list" aria-label="Artwork gallery">
+        <!-- Cards injected by gallery.js -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div class="site-footer-logo">Oluwasegun's Ritual Art Vault</div>
+        <p class="site-footer-text">A personal art gallery. All artwork © the artist.</p>
+        <div class="site-footer-links">
+          <span class="site-footer-link" onclick="navigateTo('rate')">Rate Art</span>
+          <span class="site-footer-link" onclick="navigateTo('halloffame')">Hall of Fame</span>
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- /#home-page -->
+
+  <!-- ─── RATE PAGE ──────────────────────── -->
+  <div id="rate-page" class="page" role="main" aria-label="Rate artwork">
+
+    <!-- Sticky header with progress -->
+    <header class="rate-header">
+      <button class="rate-back" onclick="navigateTo('home')" aria-label="Back to gallery">
+        ← Back
+      </button>
+
+      <div class="rate-progress" role="status" aria-live="polite">
+        <div class="rate-progress-text" id="rate-progress-label">Rating</div>
+        <div class="rate-progress-nums">
+          <span class="rate-progress-current" id="rate-progress-current">1</span>
+          <span class="rate-progress-sep">/</span>
+          <span class="rate-progress-total" id="rate-progress-total">0</span>
+        </div>
+        <div class="rate-progress-bar-wrap" aria-hidden="true">
+          <div class="rate-progress-bar" id="rate-progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Artwork stage -->
+    <div class="rate-stage" id="rate-stage" role="region" aria-label="Artwork rating area">
+      <!-- Content injected by rating.js -->
+    </div>
+
+  </div><!-- /#rate-page -->
+
+  <!-- ─── HALL OF FAME PAGE ──────────────── -->
+  <div id="halloffame-page" class="page" role="main" aria-label="Hall of Fame">
+
+    <!-- Page header -->
+    <header class="hof-header">
+      <div class="hof-eyebrow">Best of the Best</div>
+      <h1 class="hof-title">Hall of <span>Fame</span></h1>
+      <p class="hof-subtitle">Ranked by Our Community. You've Spoken.</p>
+    </header>
+
+    <!-- Podium section -->
+    <section class="hof-podium-section" aria-label="Top 3 ranked artworks">
+      <div class="hof-podium" id="hof-podium">
+        <!-- Injected by halloffame.js -->
+      </div>
+    </section>
+
+    <!-- Full ranking list -->
+    <section class="hof-list-section" aria-label="Full ranking list">
+      <h2 class="hof-list-title">Full Rankings</h2>
+      <div class="hof-rank-list" id="hof-rank-list" role="list">
+        <!-- Injected by halloffame.js -->
+      </div>
+    </section>
+
+  </div><!-- /#halloffame-page -->
+
+</div><!-- /#app -->
+
+<!-- ══════════════════════════════════════
+     FULLSCREEN MODAL
+══════════════════════════════════════ -->
+<div id="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-backdrop" aria-hidden="true"></div>
+
+  <div class="modal-container">
+    <button class="modal-close" aria-label="Close artwork">✕</button>
+
+    <!-- Left: Image -->
+    <div class="modal-image-pane">
+      <div id="modal-img-wrap">
+        <!-- Canvas injected by gallery.js -->
+      </div>
+    </div>
+
+    <!-- Right: Info -->
+    <div class="modal-info-pane">
+      <div class="modal-eyebrow">Oluwasegun's Ritual Art Vault Collection</div>
+      <h2 class="modal-title" id="modal-title">Artwork Title</h2>
+      <div class="modal-divider" aria-hidden="true"></div>
+
+      <div class="modal-rating-section" id="modal-rating-section">
+        <!-- Rating info injected by gallery.js -->
+      </div>
+
+      <div class="modal-footer" id="modal-footer">
+        <!-- Footer content injected by gallery.js -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<!-- Firebase compat SDK (exposes window.firebase global) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js" defer></script>
+<!-- App init: must load AFTER Firebase, BEFORE app.js -->
+<script src="js/firebase-init.js?v=1" defer></script>
+<!-- Load order matters: app.js first (defines shared utilities),
+     then feature modules, then gallery/rating/hof are initialized by router -->
+<script src="js/app.js?v=27" defer></script>
+<script src="js/gallery.js?v=14" defer></script>
+<script src="js/rating.js?v=17" defer></script>
+<script src="js/halloffame.js?v=5" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+/* ─────────────────────────────────────────
+   GALLERY — MASONRY LAYOUT
+───────────────────────────────────────── */
+
+/* ── MASONRY CONTAINER ── */
+.masonry-gallery {
+  columns: 4;
+  column-gap: 16px;
+}
+
+@media (max-width: 1200px) { .masonry-gallery { columns: 3; } }
+@media (max-width: 860px)  { .masonry-gallery { columns: 2; } }
+@media (max-width: 480px)  { .masonry-gallery { columns: 2; column-gap: 10px; } }
+
+/* ── ARTWORK CARD ── */
+.artwork-card {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  display: block;
+}
+
+.artwork-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-hover);
+  border-color: var(--border-hover);
+  z-index: 2;
+}
+
+.artwork-card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  background: var(--card-bg-2);
+}
+
+.artwork-card-img-wrap img,
+.artwork-card-img-wrap canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.artwork-card:hover .artwork-card-img-wrap img,
+.artwork-card:hover .artwork-card-img-wrap canvas {
+  transform: scale(1.04);
+}
+
+/* Overlay on hover */
+.artwork-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(11, 13, 18, 0.92) 0%, rgba(11, 13, 18, 0.25) 55%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.artwork-card:hover .artwork-card-overlay {
+  opacity: 1;
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.overlay-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.overlay-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.overlay-star {
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+
+.overlay-star.empty {
+  color: var(--text-dim);
+}
+
+.overlay-avg {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.overlay-expand {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(11, 13, 18, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity var(--transition), transform var(--transition);
+  z-index: 3;
+}
+
+.artwork-card:hover .overlay-expand {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Card bottom info (always visible) */
+.artwork-card-info {
+  padding: 0.85rem 1rem;
+}
+
+.artwork-card-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.artwork-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.card-mini-stars {
+  display: flex;
+  gap: 1px;
+}
+
+.card-mini-star {
+  font-size: 0.65rem;
+  color: var(--gold);
+}
+
+.card-mini-star.empty {
+  color: var(--text-dim);
+}
+
+.card-avg-text {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+
+.card-unrated {
+  font-size: 0.73rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── LOAD MORE ── */
+.gallery-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+/* ── EMPTY STATE ── */
+.gallery-empty {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--text-muted);
+}
+
+/* ── CARD REVEAL ANIMATION ── */
+/* Applied via JS IntersectionObserver when card enters viewport */
+.artwork-card.reveal {
+  animation: cardReveal 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Cards start invisible until revealed */
+.artwork-card.pre-reveal {
+  opacity: 0;
+  transform: translateY(18px) scale(0.97);
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
