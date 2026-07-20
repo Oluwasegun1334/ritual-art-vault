@@ -145,11 +145,35 @@ const Gallery = {
       this._preloadStarted = true;
       startArtworkPreload();
     }
+    this.isRendered = true;
+  },
+
+  updateRatingsOnly() {
+    const cards = document.querySelectorAll('.artwork-card');
+    cards.forEach(card => {
+      const id = parseInt(card.dataset.id);
+      if (isNaN(id)) return;
+      const avg = State.getAvgRating(id);
+      const stars = this.buildMiniStars(avg);
+
+      const overlayRating = card.querySelector('.overlay-rating');
+      if (overlayRating) {
+        overlayRating.innerHTML = avg !== null
+          ? `<div class="overlay-stars">${stars.overlay}</div>
+             <span class="overlay-avg">${avg.toFixed(1)}</span>`
+          : `<span class="overlay-unrated" style="font-size:0.73rem; color:var(--text-muted); font-style:italic;">Not yet rated</span>`;
+      }
+    });
+
+    if (Modal.current) {
+      Modal.updateRatingDisplay();
+    }
   },
 
   buildCard(artwork, index) {
     const card = document.createElement('div');
     card.className = 'artwork-card pre-reveal';
+    card.dataset.id = artwork.id;
     // Slight stagger so cards near the top animate in sequence
     card.style.animationDelay = `${Math.min(index, 8) * 0.06}s`;
     card.setAttribute('role', 'button');
@@ -218,6 +242,55 @@ const Gallery = {
 /* ── MODAL ────────────────────────────────── */
 const Modal = {
   current: null,
+
+  updateRatingDisplay() {
+    if (!this.current) return;
+    const avg = State.getAvgRating(this.current.id);
+    const ratingSection = document.getElementById('modal-rating-section');
+    if (!ratingSection) return;
+
+    if (avg !== null) {
+      const full  = Math.floor(avg);
+      const frac  = avg - full;
+      const voteCount = Object.values(State.ratings[this.current.id] || {}).length;
+      const starsHtml = Array.from({ length: 5 }, (_, i) => {
+        if (i < full)  return `<span class="modal-star-icon">★</span>`;
+        if (i === full && frac > 0) {
+          const pct = Math.round(frac * 100);
+          return `<span class="modal-star-icon partial" style="--fill:${pct}%">★</span>`;
+        }
+        return `<span class="modal-star-icon empty">★</span>`;
+      }).join('');
+      ratingSection.innerHTML = `
+        <div class="modal-rating-label">Community Rating</div>
+        <div class="modal-avg-value">${avg.toFixed(1)}</div>
+        <div class="modal-stars-display">${starsHtml}</div>
+        <div class="modal-avg-text">${voteCount} vote${voteCount !== 1 ? 's' : ''}</div>
+      `;
+    } else {
+      ratingSection.innerHTML = `
+        <div class="modal-rating-label">Community Rating</div>
+        <div class="modal-unrated">No ratings yet</div>
+        <div class="modal-avg-text" style="margin-top:0.5rem">Be the first to rate this artwork!</div>
+      `;
+    }
+
+    const footer = document.getElementById('modal-footer');
+    if (footer) {
+      const ranked = State.getRankedArtworks();
+      const rank  = ranked.findIndex(a => a.id === this.current.id) + 1;
+      const rankBadge = avg !== null
+        ? `<div class="modal-rank-badge">🏅 Ranked #${rank} overall</div>`
+        : `<button class="btn btn-ghost" onclick="navigateTo('rate'); Modal.close()">Rate This Art →</button>`;
+      
+      const badgeContainer = footer.firstElementChild;
+      if (badgeContainer && !badgeContainer.classList.contains('modal-download-btn')) {
+        const temp = document.createElement('div');
+        temp.innerHTML = rankBadge;
+        footer.replaceChild(temp.firstElementChild, badgeContainer);
+      }
+    }
+  },
 
   open(artwork) {
     this.current = artwork;

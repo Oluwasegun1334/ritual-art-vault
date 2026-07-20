@@ -99,9 +99,21 @@ const State = {
       Object.entries(data).forEach(([artworkId, artworkData]) => {
         State.ratings[artworkId] = artworkData?.votes || {};
       });
-      // Re-render the currently visible page with fresh data
-      if (Router.current === 'home')       Gallery.render();
-      if (Router.current === 'halloffame') HallOfFame.render();
+      // Smart live updates to prevent page blinking
+      if (Router.current === 'home') {
+        if (Gallery.isRendered) {
+          Gallery.updateRatingsOnly();
+        } else {
+          Gallery.render();
+        }
+      }
+      if (Router.current === 'halloffame') {
+        if (HallOfFame.isRendered) {
+          HallOfFame.updateRatingsAndRanks();
+        } else {
+          HallOfFame.render();
+        }
+      }
     }, err => {
       console.error('[Art Vault] Database error:', err);
     });
@@ -239,9 +251,21 @@ const Router = {
     this.current = page;
 
     // Trigger page-specific init
-    if (page === 'home') Gallery.render();
+    if (page === 'home') {
+      if (!Gallery.isRendered) {
+        Gallery.render();
+      } else {
+        Gallery.updateRatingsOnly();
+      }
+    }
     if (page === 'rate') RatingSession.start();
-    if (page === 'halloffame') HallOfFame.render();
+    if (page === 'halloffame') {
+      if (!HallOfFame.isRendered) {
+        HallOfFame.render();
+      } else {
+        HallOfFame.updateRatingsAndRanks();
+      }
+    }
   },
 
   init() {
