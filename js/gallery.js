@@ -3,54 +3,58 @@
    Masonry gallery rendering + modal
 ═══════════════════════════════════════════ */
 
-/* ── SHARED IMAGE HELPER ─────────────────────
-   Shows a clean loading shimmer, then swaps in
-   the real artwork image once it has loaded.
-   No colourful placeholder art ever appears.
+/* ── SEQUENTIAL BACKGROUND PRELOADER ────────
+   Downloads all artwork images one by one as
+   soon as the page loads. Visible images appear
+   instantly; the rest download quietly in the
+   background and get cached by the browser.
+   Second visit = everything loads from cache.
 ──────────────────────────────────────────── */
-const lazyImageObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const container = entry.target;
-      const img = container._lazyImg;
-      if (img && !img.src) {
-        img.src = container._lazySrc;
-      }
-      lazyImageObserver.unobserve(container);
-    }
-  });
-}, { rootMargin: '200px 0px' });
+const _preloadQueue   = [];   // filenames waiting to be downloaded
+let   _preloadActive  = false; // is the queue currently running?
+
+function _runPreloadQueue() {
+  if (_preloadActive || _preloadQueue.length === 0) return;
+  _preloadActive = true;
+  const next = _preloadQueue.shift();
+  const img  = new Image();
+  img.onload = img.onerror = () => {
+    _preloadActive = false;
+    _runPreloadQueue(); // download the next one
+  };
+  img.src = next;
+}
+
+function _queuePreload(src) {
+  _preloadQueue.push(src);
+  _runPreloadQueue();
+}
 
 function getArtworkElement(artwork, width, height, className = '') {
-  // Create a shimmer container that matches the expected size
+  const src = `artwork/${artwork.filename}`;
+
+  // Create a shimmer shown while the image is loading
   const shimmer = document.createElement('div');
   shimmer.className = 'artwork-shimmer' + (className ? ' ' + className : '');
   shimmer.style.width  = '100%';
   shimmer.style.height = (height || 400) + 'px';
   shimmer.style.display = 'block';
 
-  // Load the real image in the background
   const img = new Image();
   img.alt = artwork.title;
   if (className) img.className = className;
-  
-  // Set default initial styles (can be overridden by caller on the shimmer)
-  img.style.display    = 'block';
+  img.style.display = 'block';
 
   img.onload = () => {
-    // Dynamically transfer any inline styles applied to the shimmer over to the loaded image
     img.style.width      = shimmer.style.width || '100%';
     img.style.height     = shimmer.style.height || 'auto';
     img.style.objectFit  = shimmer.style.objectFit || '';
-    
     if (shimmer.style.maxWidth)  img.style.maxWidth  = shimmer.style.maxWidth;
     if (shimmer.style.maxHeight) img.style.maxHeight = shimmer.style.maxHeight;
-
     if (shimmer.parentNode) shimmer.parentNode.replaceChild(img, shimmer);
   };
 
   img.onerror = () => {
-    // Artwork file missing — show a minimal dark tile with the title
     const fallback = document.createElement('div');
     fallback.className = 'artwork-fallback' + (className ? ' ' + className : '');
     fallback.style.width   = shimmer.style.width || '100%';
@@ -60,13 +64,18 @@ function getArtworkElement(artwork, width, height, className = '') {
     if (shimmer.parentNode) shimmer.parentNode.replaceChild(fallback, shimmer);
   };
 
-  // Attach properties to shimmer for lazy loading
-  shimmer._lazyImg = img;
-  shimmer._lazySrc = `artwork/${artwork.filename}`;
-  lazyImageObserver.observe(shimmer);
+  // Start downloading immediately — browser cache handles the rest
+  img.src = src;
 
   return shimmer;
 }
+
+// Kick off background sequential preload of ALL artworks right away
+// so they're cached before the user even scrolls to them
+function startArtworkPreload() {
+  Artworks.forEach(a => _queuePreload(`artwork/${a.filename}`));
+}
+
 
 /* ── INTERSECTION OBSERVER for card reveal ── */
 let _revealObserver = null;
@@ -89,6 +98,8 @@ function getRevealObserver() {
 /* ══════════════════════════════════════════ */
 
 const Gallery = {
+  _preloadStarted: false,
+
   render() {
     const container = document.getElementById('masonry-gallery');
     if (!container) return;
@@ -103,9 +114,14 @@ const Gallery = {
     Artworks.forEach((artwork, i) => {
       const card = this.buildCard(artwork, i);
       container.appendChild(card);
-      // Observe for scroll-triggered reveal
       observer.observe(card);
     });
+
+    // Start sequential background preload once (browser caches for future visits)
+    if (!this._preloadStarted) {
+      this._preloadStarted = true;
+      startArtworkPreload();
+    }
   },
 
   buildCard(artwork, index) {

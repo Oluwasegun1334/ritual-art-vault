@@ -1,21 +1,21 @@
 /* ─────────────────────────────────────────
-   GALLERY — MASONRY LAYOUT
+   GALLERY — GRID LAYOUT (horizontal, left-to-right)
 ───────────────────────────────────────── */
 
-/* ── MASONRY CONTAINER ── */
+/* ── GRID CONTAINER ── */
 .masonry-gallery {
-  columns: 4;
-  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
 }
 
-@media (max-width: 1200px) { .masonry-gallery { columns: 3; } }
-@media (max-width: 860px)  { .masonry-gallery { columns: 2; } }
-@media (max-width: 480px)  { .masonry-gallery { columns: 2; column-gap: 10px; } }
+@media (max-width: 1200px) { .masonry-gallery { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 860px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
 
 /* ── ARTWORK CARD ── */
 .artwork-card {
-  break-inside: avoid;
-  margin-bottom: 16px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--card-bg);
@@ -194,12 +194,10 @@
 }
 
 /* ── CARD REVEAL ANIMATION ── */
-/* Applied via JS IntersectionObserver when card enters viewport */
 .artwork-card.reveal {
   animation: cardReveal 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-/* Cards start invisible until revealed */
 .artwork-card.pre-reveal {
   opacity: 0;
   transform: translateY(18px) scale(0.97);
