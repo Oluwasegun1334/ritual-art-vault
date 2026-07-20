@@ -31,7 +31,7 @@ function _queuePreload(src) {
 }
 
 function resizeGridItem(item) {
-  const rowHeight = 10;
+  const rowHeight = 1;
   const imgWrap = item.querySelector('.artwork-card-img-wrap');
   if (!imgWrap) return;
   const height = imgWrap.getBoundingClientRect().height;
