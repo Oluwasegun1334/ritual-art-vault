@@ -1,20 +1,38 @@
-/* ── MASONRY GRID CONTAINER (horizontal ordering) ── */
+/* ── MASONRY CONTAINER (flex layout with columns) ── */
 .masonry-gallery {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 1px;
-  column-gap: 16px;
-  row-gap: 0;
+  display: flex;
+  gap: 16px;
   align-items: start;
+  width: 100%;
 }
 
-@media (max-width: 1200px) { .masonry-gallery { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 860px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); column-gap: 12px; } }
-@media (max-width: 480px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); column-gap: 10px; } }
+.gallery-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .masonry-gallery {
+    gap: 12px;
+  }
+  .gallery-col {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry-gallery {
+    gap: 10px;
+  }
+  .gallery-col {
+    gap: 10px;
+  }
+}
 
 /* ── ARTWORK CARD ── */
 .artwork-card {
-  margin-bottom: 16px; /* spacing between rows — included in span calculation */
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--card-bg);

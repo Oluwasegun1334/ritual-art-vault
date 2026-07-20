@@ -30,15 +30,6 @@ function _queuePreload(src) {
   _runPreloadQueue();
 }
 
-function resizeGridItem(item) {
-  const rowHeight = 1;
-  const imgWrap = item.querySelector('.artwork-card-img-wrap');
-  if (!imgWrap) return;
-  const height = imgWrap.getBoundingClientRect().height;
-  const rowSpan = Math.ceil((height + 16) / rowHeight);
-  item.style.gridRowEnd = `span ${rowSpan}`;
-}
-
 function getArtworkElement(artwork, width, height, className = '') {
   const src = `artwork/${artwork.filename}`;
 
@@ -60,13 +51,7 @@ function getArtworkElement(artwork, width, height, className = '') {
     img.style.objectFit  = shimmer.style.objectFit || '';
     if (shimmer.style.maxWidth)  img.style.maxWidth  = shimmer.style.maxWidth;
     if (shimmer.style.maxHeight) img.style.maxHeight = shimmer.style.maxHeight;
-    if (shimmer.parentNode) {
-      shimmer.parentNode.replaceChild(img, shimmer);
-      const card = img.closest('.artwork-card');
-      if (card) {
-        resizeGridItem(card);
-      }
-    }
+    if (shimmer.parentNode) shimmer.parentNode.replaceChild(img, shimmer);
   };
 
   img.onerror = () => {
@@ -76,13 +61,7 @@ function getArtworkElement(artwork, width, height, className = '') {
     fallback.style.height  = shimmer.style.height || (height || 400) + 'px';
     fallback.style.display = 'flex';
     fallback.innerHTML = `<span class="artwork-fallback-label">${artwork.title}</span>`;
-    if (shimmer.parentNode) {
-      shimmer.parentNode.replaceChild(fallback, shimmer);
-      const card = fallback.closest('.artwork-card');
-      if (card) {
-        resizeGridItem(card);
-      }
-    }
+    if (shimmer.parentNode) shimmer.parentNode.replaceChild(fallback, shimmer);
   };
 
   // Start downloading immediately — browser cache handles the rest
@@ -120,6 +99,16 @@ function getRevealObserver() {
 
 const Gallery = {
   _preloadStarted: false,
+  _currentColCount: 0,
+
+  // Get optimal column count based on screen width
+  getColumnCount() {
+    const width = window.innerWidth;
+    if (width <= 480) return 2;
+    if (width <= 860) return 2;
+    if (width <= 1200) return 3;
+    return 4;
+  },
 
   render() {
     const container = document.getElementById('masonry-gallery');
@@ -130,13 +119,25 @@ const Gallery = {
     const badge = document.getElementById('gallery-count');
     if (badge) badge.textContent = `${Artworks.length} works`;
 
+    const numCols = this.getColumnCount();
+    this._currentColCount = numCols;
+
+    // Create column divs
+    const cols = Array.from({ length: numCols }, () => {
+      const col = document.createElement('div');
+      col.className = 'gallery-col';
+      container.appendChild(col);
+      return col;
+    });
+
     const observer = getRevealObserver();
 
+    // Distribute artworks horizontally (left-to-right, row-by-row)
     Artworks.forEach((artwork, i) => {
       const card = this.buildCard(artwork, i);
-      container.appendChild(card);
+      const colIndex = i % numCols;
+      cols[colIndex].appendChild(card);
       observer.observe(card);
-      resizeGridItem(card);
     });
 
     // Start sequential background preload once (browser caches for future visits)
@@ -337,9 +338,12 @@ window.addEventListener('popstate', (e) => {
   }
 });
 
-// Recalculate grid spans on window resize or orientation change
+// Re-render columns dynamically on resize ONLY if the column count needs to change
 window.addEventListener('resize', () => {
-  const cards = document.querySelectorAll('.artwork-card');
-  cards.forEach(card => resizeGridItem(card));
+  if (Router.current === 'home') {
+    const targetCols = Gallery.getColumnCount();
+    if (targetCols !== Gallery._currentColCount) {
+      Gallery.render();
+    }
+  }
 });
-
