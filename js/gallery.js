@@ -30,6 +30,15 @@ function _queuePreload(src) {
   _runPreloadQueue();
 }
 
+function resizeGridItem(item) {
+  const rowHeight = 10;
+  const imgWrap = item.querySelector('.artwork-card-img-wrap');
+  if (!imgWrap) return;
+  const height = imgWrap.getBoundingClientRect().height;
+  const rowSpan = Math.ceil((height + 16) / rowHeight);
+  item.style.gridRowEnd = `span ${rowSpan}`;
+}
+
 function getArtworkElement(artwork, width, height, className = '') {
   const src = `artwork/${artwork.filename}`;
 
@@ -51,7 +60,13 @@ function getArtworkElement(artwork, width, height, className = '') {
     img.style.objectFit  = shimmer.style.objectFit || '';
     if (shimmer.style.maxWidth)  img.style.maxWidth  = shimmer.style.maxWidth;
     if (shimmer.style.maxHeight) img.style.maxHeight = shimmer.style.maxHeight;
-    if (shimmer.parentNode) shimmer.parentNode.replaceChild(img, shimmer);
+    if (shimmer.parentNode) {
+      shimmer.parentNode.replaceChild(img, shimmer);
+      const card = img.closest('.artwork-card');
+      if (card) {
+        resizeGridItem(card);
+      }
+    }
   };
 
   img.onerror = () => {
@@ -61,7 +76,13 @@ function getArtworkElement(artwork, width, height, className = '') {
     fallback.style.height  = shimmer.style.height || (height || 400) + 'px';
     fallback.style.display = 'flex';
     fallback.innerHTML = `<span class="artwork-fallback-label">${artwork.title}</span>`;
-    if (shimmer.parentNode) shimmer.parentNode.replaceChild(fallback, shimmer);
+    if (shimmer.parentNode) {
+      shimmer.parentNode.replaceChild(fallback, shimmer);
+      const card = fallback.closest('.artwork-card');
+      if (card) {
+        resizeGridItem(card);
+      }
+    }
   };
 
   // Start downloading immediately — browser cache handles the rest
@@ -115,6 +136,7 @@ const Gallery = {
       const card = this.buildCard(artwork, i);
       container.appendChild(card);
       observer.observe(card);
+      resizeGridItem(card);
     });
 
     // Start sequential background preload once (browser caches for future visits)
@@ -314,3 +336,10 @@ window.addEventListener('popstate', (e) => {
     Modal.close(true);
   }
 });
+
+// Recalculate grid spans on window resize or orientation change
+window.addEventListener('resize', () => {
+  const cards = document.querySelectorAll('.artwork-card');
+  cards.forEach(card => resizeGridItem(card));
+});
+

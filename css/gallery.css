@@ -1,21 +1,20 @@
-/* ─────────────────────────────────────────
-   GALLERY — GRID LAYOUT (horizontal, left-to-right)
-───────────────────────────────────────── */
-
-/* ── GRID CONTAINER ── */
+/* ── MASONRY GRID CONTAINER (horizontal ordering) ── */
 .masonry-gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-auto-rows: 10px;
+  column-gap: 16px;
+  row-gap: 0;
   align-items: start;
 }
 
 @media (max-width: 1200px) { .masonry-gallery { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 860px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+@media (max-width: 860px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); column-gap: 12px; } }
+@media (max-width: 480px)  { .masonry-gallery { grid-template-columns: repeat(2, 1fr); column-gap: 10px; } }
 
 /* ── ARTWORK CARD ── */
 .artwork-card {
+  margin-bottom: 16px; /* spacing between rows — included in span calculation */
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--card-bg);
