@@ -185,18 +185,22 @@ const State = {
     if (!norm) return { success: false, message: 'Please enter your name.' };
     if (norm.length < 2) return { success: false, message: 'Name must be at least 2 characters.' };
     try {
-      const snap = await db.ref('users/' + norm).once('value');
-      if (!snap.exists()) {
-        // New user — create automatically
-        await db.ref('users/' + norm).set({ username: username.trim() });
+      // Attempt Firebase sync, but don't block user if rules restrict write
+      try {
+        const snap = await db.ref('users/' + norm).once('value');
+        if (!snap || !snap.exists()) {
+          await db.ref('users/' + norm).set({ username: username.trim() });
+        }
+      } catch (dbErr) {
+        console.warn('[Art Vault] Firebase user sync notice:', dbErr);
       }
-      const stored = snap.exists() ? snap.val() : { username: username.trim() };
-      this.currentUser = { username: stored.username || username.trim() };
+
+      this.currentUser = { username: username.trim() };
       this.saveSession();
       return { success: true };
     } catch(e) {
       console.error('[Art Vault] Auth error:', e);
-      return { success: false, message: 'Connection error. Please check your internet and try again.' };
+      return { success: false, message: 'Login error. Please try again.' };
     }
   },
 
